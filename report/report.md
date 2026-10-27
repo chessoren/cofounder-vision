@@ -146,15 +146,3 @@ npx electron ../demo-app/window.cjs &                                           
 cd ../takeover && uv sync && uv run python learn.py ../demo-app/recordings/approve-invoice.mp4
 uv run python evaluate.py --brains policy,llm                                                 # agent evaluation
 ```
-
-## 10. Disclosure
-
-All the code in this repository was written during the competition's build phase:
-
-- the OpenCV 5 library (`vision/`);
-- the AWS Lambda service and web demo (`cloud/`);
-- the learning step and the takeover agent (`takeover/`);
-- the evaluation app and harness (`demo-app/`, `takeover/evaluate.py`).
-
-AI coding assistants were used during development. The agentic workflow evaluated here is the product's runtime loop,
-not the use of a coding assistant.
