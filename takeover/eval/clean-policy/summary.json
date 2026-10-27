@@ -1,0 +1,8 @@
+{
+  "completed_runs": 5,
+  "clicks": 15,
+  "human_turns": 1,
+  "refused_clicks": 0,
+  "seconds": 99.4,
+  "out": "eval/clean-policy"
+}

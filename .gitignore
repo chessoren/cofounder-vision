@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+cloud/build/
+cloud/endpoint.json
+takeover/runs/
+*.egg-info
+.DS_Store

@@ -1,0 +1,8 @@
+{
+  "completed_runs": 2,
+  "clicks": 6,
+  "human_turns": 1,
+  "refused_clicks": 0,
+  "seconds": 113.0,
+  "out": "eval/disabled-llm"
+}

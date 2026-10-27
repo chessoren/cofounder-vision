@@ -1,0 +1,26 @@
+{
+  "video": "../demo-app/recordings/approve-invoice.mp4",
+  "frames": 125,
+  "fps": 10,
+  "ground_truth_clicks": [
+    {
+      "label": "Review the first invoice",
+      "t": 2.85,
+      "x": 1045,
+      "y": 220
+    },
+    {
+      "label": "Match it with its purchase order",
+      "t": 5.79,
+      "x": 309,
+      "y": 322
+    },
+    {
+      "label": "Approve",
+      "t": 9.02,
+      "x": 413,
+      "y": 383
+    }
+  ],
+  "note": "Scripted demonstrator; ground truth is for evaluation only and is never given to the agent."
+}

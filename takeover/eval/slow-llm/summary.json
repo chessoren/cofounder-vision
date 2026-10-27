@@ -1,0 +1,8 @@
+{
+  "completed_runs": 3,
+  "clicks": 9,
+  "human_turns": 2,
+  "refused_clicks": 0,
+  "seconds": 138.3,
+  "out": "eval/slow-llm"
+}

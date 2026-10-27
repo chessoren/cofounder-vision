@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cofounder Vision</title>
+<meta name="description" content="OpenCV 5 perception for an agent that learns your workflows from one screen recording. Running on AWS Lambda (arm64, Graviton).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2370A8F2'/%3E%3Cstop offset='1' stop-color='%233D82DE'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='white' stroke-width='3'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#EEF1F7; --ink:#11315D; --ink2:rgba(13,27,75,.5); --ink3:rgba(13,27,75,.66);
+  --accent:#3D82DE; --accent-soft:rgba(61,130,222,.10); --line:rgba(34,106,205,.12);
+  --card:#fff; --ok:#1F9D63; --ok-soft:rgba(31,157,99,.10); --warn:#C7791B; --warn-soft:rgba(199,121,27,.12);
+  --bad:#D2483F; --bad-soft:rgba(210,72,63,.10);
+  --shadow:0 1px 2px rgba(17,49,93,.04),0 8px 24px -6px rgba(17,49,93,.10),0 24px 48px -24px rgba(17,49,93,.12);
+  --grad:linear-gradient(180deg,#70A8F2,#3D82DE);
+  --r:22px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:"Inter Tight",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
+  background:var(--bg);min-height:100vh;line-height:1.45;font-size:15px;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(900px 520px at 8% -8%,rgba(112,168,242,.30),transparent 60%),
+    radial-gradient(760px 520px at 105% 10%,rgba(150,120,255,.14),transparent 60%),
+    radial-gradient(900px 600px at 50% 120%,rgba(61,130,222,.14),transparent 60%);
+  background-attachment:fixed}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid rgba(61,130,222,.55);outline-offset:2px;border-radius:10px}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 40px}
+header.top{display:flex;gap:18px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:22px}
+.brand{display:flex;gap:14px;align-items:center}
+.logo{width:48px;height:48px;border-radius:14px;background:var(--grad);display:grid;place-items:center;box-shadow:0 8px 20px -6px rgba(61,130,222,.6);flex:none}
+.logo svg{width:26px;height:26px}
+h1{font-size:28px;line-height:1.1;margin:0;font-weight:700;letter-spacing:-.02em}
+.sub{margin:6px 0 0;color:var(--ink2);font-size:15px;max-width:560px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);
+  box-shadow:var(--shadow);font-size:13px;font-weight:500;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:#B9C3D6;flex:none}
+.pill.ok .dot{background:var(--ok);box-shadow:0 0 0 4px rgba(31,157,99,.15)}
+.pill.err .dot{background:var(--bad)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.tabs{display:flex;gap:6px;padding:6px;margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{appearance:none;border:0;background:transparent;color:var(--ink3);font:inherit;font-weight:600;font-size:15px;padding:11px 16px;border-radius:16px;cursor:pointer;
+  display:flex;align-items:center;gap:9px;white-space:nowrap;flex:1;justify-content:center}
+.tab:hover{color:var(--ink);background:rgba(61,130,222,.06)}
+.tab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent)}
+.tab .n{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:12px;background:rgba(17,49,93,.07)}
+.tab[aria-selected="true"] .n{background:var(--grad);color:#fff}
+.panel{padding:24px}
+.panel[hidden]{display:none}
+.lead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+h2{font-size:21px;margin:0 0 4px;letter-spacing:-.01em}
+.muted{color:var(--ink2)}
+.small{font-size:13px}
+.btn{appearance:none;border:0;font:inherit;font-weight:600;font-size:14px;border-radius:13px;padding:11px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+  transition:transform .08s ease,box-shadow .2s ease,opacity .2s}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--grad);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 8px 18px -8px rgba(61,130,222,.9)}
+.btn.primary:hover{box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 10px 22px -8px rgba(61,130,222,1)}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:rgba(61,130,222,.35)}
+.btn[disabled]{opacity:.55;cursor:progress}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.drop{position:relative;border:1.5px dashed rgba(61,130,222,.32);border-radius:18px;background:linear-gradient(180deg,rgba(112,168,242,.06),rgba(61,130,222,.02));
+  padding:16px;min-height:150px;display:flex;flex-direction:column;gap:10px;justify-content:center;align-items:center;text-align:center;transition:border-color .2s, background .2s}
+.drop.over{border-color:var(--accent);background:rgba(61,130,222,.08)}
+.drop label.title{font-weight:600}
+.drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.drop img{max-width:100%;max-height:160px;border-radius:10px;border:1px solid var(--line);background:#fff;object-fit:contain}
+.drop .hint{font-size:12.5px;color:var(--ink2)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{appearance:none;font:inherit;font-size:13px;font-weight:500;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer}
+.chip:hover{border-color:rgba(61,130,222,.4);color:var(--accent)}
+.chip .ico{color:var(--accent);margin-right:4px}
+.result{margin-top:20px;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(250px,1fr);gap:16px;align-items:start}
+.result[hidden]{display:none}
+.viewer{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#F6F8FC}
+.viewer img{display:block;width:100%;height:auto;cursor:zoom-in}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{border:1px solid var(--line);border-radius:14px;padding:11px 13px;background:#FBFCFE}
+.stat .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);font-weight:600}
+.stat .v{font-size:19px;font-weight:650;margin-top:2px;font-variant-numeric:tabular-nums;word-break:break-word}
+.stat.wide{grid-column:1/-1}
+.verdict{border-radius:16px;padding:16px;display:flex;gap:12px;align-items:center;font-weight:650;font-size:18px;grid-column:1/-1}
+.verdict .big{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#fff;flex:none;font-size:20px}
+.v-ok{background:var(--ok-soft);color:#11683F}.v-ok .big{background:var(--ok)}
+.v-warn{background:var(--warn-soft);color:#7E4A0B}.v-warn .big{background:var(--warn)}
+.v-bad{background:var(--bad-soft);color:#8E241D}.v-bad .big{background:var(--bad)}
+.bar{height:6px;border-radius:6px;background:rgba(17,49,93,.08);overflow:hidden;margin-top:7px}
+.bar>i{display:block;height:100%;background:var(--grad);border-radius:6px;width:0;transition:width .5s ease}
+.status{margin-top:14px;font-size:14px;color:var(--ink3);display:flex;gap:10px;align-items:center;min-height:22px}
+.status.err{color:var(--bad)}
+.spin{width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(61,130,222,.2);border-top-color:var(--accent);animation:sp 0.8s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.progress{height:8px;border-radius:8px;background:rgba(17,49,93,.07);overflow:hidden;flex:1;max-width:280px}
+.progress>i{display:block;height:100%;width:0;background:var(--grad);transition:width .2s}
+.timeline{list-style:none;margin:18px 0 0;padding:0;position:relative}
+.timeline:before{content:"";position:absolute;left:19px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,rgba(61,130,222,.35),rgba(61,130,222,.05))}
+.step{position:relative;display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;margin-bottom:14px}
+.step .idx{width:40px;height:40px;border-radius:13px;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:700;z-index:1;box-shadow:0 6px 14px -6px rgba(61,130,222,.8)}
+.step .body{border:1px solid var(--line);border-radius:18px;padding:14px;background:#fff;display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:14px}
+.step .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:600;background:var(--accent-soft);color:var(--accent)}
+.badge.gray{background:rgba(17,49,93,.06);color:var(--ink3)}
+.step .kf{width:100%;border-radius:12px;border:1px solid var(--line);display:block;cursor:zoom-in;background:#F6F8FC}
+.step .side{display:flex;flex-direction:column;gap:8px}
+.step .target{border:1px solid var(--line);border-radius:12px;background:#F6F8FC;padding:8px;display:grid;place-items:center;min-height:70px}
+.step .target img{max-width:100%;max-height:120px;border-radius:6px}
+.kv{font-size:12.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.kv b{color:var(--ink);font-weight:600}
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+.api{margin-top:22px;padding:22px}
+.api h3{margin:0 0 6px;font-size:17px}
+.endpoints{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:12px}
+.ep{border:1px solid var(--line);border-radius:14px;padding:11px 13px;background:#FBFCFE;font-size:13px}
+.ep code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;font-weight:600}
+.m{font-size:11px;font-weight:700;border-radius:6px;padding:2px 6px;margin-right:6px;background:rgba(31,157,99,.12);color:#11683F}
+.m.post{background:var(--accent-soft);color:var(--accent)}
+pre{background:#0F2445;color:#DCE7FA;border-radius:14px;padding:14px;overflow-x:auto;font-size:12.5px;margin:12px 0 0}
+footer{margin-top:26px;padding:20px 22px;display:flex;gap:14px;justify-content:space-between;flex-wrap:wrap;align-items:center}
+footer p{margin:0;font-size:13.5px;color:var(--ink3);max-width:720px}
+.shield{display:flex;gap:12px;align-items:flex-start}
+.shield .ic{width:34px;height:34px;border-radius:11px;background:var(--ok-soft);display:grid;place-items:center;flex:none;color:var(--ok)}
+dialog{border:0;border-radius:18px;padding:0;max-width:min(1200px,96vw);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(13,27,75,.45);backdrop-filter:blur(3px)}
+dialog img{display:block;max-width:100%;max-height:86vh}
+dialog .close{position:absolute;top:10px;right:10px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.range{display:flex;gap:10px;align-items:center;font-size:13.5px;color:var(--ink3)}
+.range input{accent-color:var(--accent)}
+@media (max-width:860px){
+  .result{grid-template-columns:1fr}
+  .step .body{grid-template-columns:1fr}
+  .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .wrap{padding:18px 12px 28px}
+  h1{font-size:23px}
+  .grid2{grid-template-columns:1fr}
+  .panel{padding:16px}
+  .tab{padding:10px 10px;font-size:13.5px}
+  .tab .lbl-long{display:none}
+  .step{grid-template-columns:30px minmax(0,1fr);gap:10px}
+  .step .idx{width:30px;height:30px;border-radius:10px;font-size:13px}
+  .timeline:before{left:14px}
+  .pill{white-space:normal}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3.2"/></svg></div>
+      <div>
+        <h1>Cofounder Vision</h1>
+        <p class="sub">OpenCV 5 perception for an agent that learns your workflows from one screen recording</p>
+      </div>
+    </div>
+    <div id="health" class="pill" role="status" aria-live="polite"><span class="dot"></span><span id="healthText">Connecting to AWS Lambda…</span></div>
+  </header>
+
+  <nav class="card tabs" role="tablist" aria-label="Demos">
+    <button class="tab" role="tab" id="tab-learn" aria-controls="p-learn" aria-selected="true"><span class="n">1</span><span>Learn<span class="lbl-long"> from a recording</span></span></button>
+    <button class="tab" role="tab" id="tab-find" aria-controls="p-find" aria-selected="false" tabindex="-1"><span class="n">2</span><span>Find<span class="lbl-long"> on screen</span></span></button>
+    <button class="tab" role="tab" id="tab-verify" aria-controls="p-verify" aria-selected="false" tabindex="-1"><span class="n">3</span><span>Did it work?</span></button>
+  </nav>
+
+  <main>
+  <!-- 1. Learn from a recording -->
+  <section class="card panel" id="p-learn" role="tabpanel" aria-labelledby="tab-learn" tabindex="0">
+    <div class="lead">
+      <div>
+        <h2>Learn from a recording</h2>
+        <div class="muted">Record yourself doing a task once. OpenCV splits it into steps: what you clicked, where, and what changed.</div>
+      </div>
+      <button class="btn primary" id="learnSample" type="button">▶&nbsp; Try the sample</button>
+    </div>
+    <div class="drop" id="videoDrop">
+      <label class="title" for="videoFile">Drop a screen recording here, or click to choose</label>
+      <div class="hint">MP4 or MOV, up to 40 MB. Uploaded straight to a private, encrypted S3 bucket with a 10-minute presigned URL, then deleted right after analysis.</div>
+      <input type="file" id="videoFile" accept="video/mp4,video/quicktime,.mp4,.mov">
+    </div>
+    <div class="status" id="learnStatus" aria-live="polite"></div>
+    <div id="learnOut" hidden>
+      <div class="summary" id="learnSummary"></div>
+      <ol class="timeline" id="timeline" aria-label="Detected steps"></ol>
+    </div>
+  </section>
+
+  <!-- 2. Find on screen -->
+  <section class="card panel" id="p-find" role="tabpanel" aria-labelledby="tab-find" tabindex="0" hidden>
+    <div class="lead">
+      <div>
+        <h2>Find on screen</h2>
+        <div class="muted">Multi-scale template matching finds a UI element on any screen, at any Retina scale, and flags look-alikes.</div>
+      </div>
+      <div class="chips" id="locateSamples" aria-label="Sample inputs"></div>
+    </div>
+    <div class="grid2">
+      <div class="drop" data-drop="shot">
+        <label class="title" for="shotFile">Screenshot</label>
+        <img id="shotPrev" alt="Screenshot preview" hidden>
+        <div class="hint">PNG / JPEG, max 4096×4096</div>
+        <input type="file" id="shotFile" accept="image/png,image/jpeg,image/webp">
+      </div>
+      <div class="drop" data-drop="tmpl">
+        <label class="title" for="tmplFile">Element to find (template)</label>
+        <img id="tmplPrev" alt="Template preview" hidden>
+        <div class="hint">A crop of the button, icon or field</div>
+        <input type="file" id="tmplFile" accept="image/png,image/jpeg,image/webp">
+      </div>
+    </div>
+    <div class="row" style="margin-top:14px;justify-content:space-between">
+      <div class="range"><label for="minScore">Min. score</label><input type="range" id="minScore" min="0.5" max="0.99" step="0.01" value="0.80"><output id="minScoreOut" for="minScore">0.80</output></div>
+      <button class="btn primary" id="locateBtn" type="button">Locate</button>
+    </div>
+    <div class="status" id="findStatus" aria-live="polite"></div>
+    <div class="result" id="findOut" hidden>
+      <div class="viewer"><img id="findImg" alt="Screenshot annotated with the located element"></div>
+      <div class="stats" id="findStats"></div>
+    </div>
+  </section>
+
+  <!-- 3. Did it work? -->
+  <section class="card panel" id="p-verify" role="tabpanel" aria-labelledby="tab-verify" tabindex="0" hidden>
+    <div class="lead">
+      <div>
+        <h2>Did it work?</h2>
+        <div class="muted">After every action the agent checks the screen: did something change where it clicked, and how much? Structural similarity (SSIM) plus change regions.</div>
+      </div>
+      <div class="chips" id="verifySamples" aria-label="Sample inputs"></div>
+    </div>
+    <div class="grid2">
+      <div class="drop" data-drop="before">
+        <label class="title" for="beforeFile">Before</label>
+        <img id="beforePrev" alt="Before screenshot preview" hidden>
+        <div class="hint">Screen before the action</div>
+        <input type="file" id="beforeFile" accept="image/png,image/jpeg,image/webp">
+      </div>
+      <div class="drop" data-drop="after">
+        <label class="title" for="afterFile">After</label>
+        <img id="afterPrev" alt="After screenshot preview" hidden>
+        <div class="hint">Same screen after the action</div>
+        <input type="file" id="afterFile" accept="image/png,image/jpeg,image/webp">
+      </div>
+    </div>
+    <div class="row" style="margin-top:14px;justify-content:flex-end">
+      <button class="btn primary" id="verifyBtn" type="button">Verify change</button>
+    </div>
+    <div class="status" id="verifyStatus" aria-live="polite"></div>
+    <div class="result" id="verifyOut" hidden>
+      <div class="viewer"><img id="verifyImg" alt="After screenshot with changed regions outlined"></div>
+      <div class="stats" id="verifyStats"></div>
+    </div>
+  </section>
+  </main>
+
+  <section class="card api" aria-labelledby="apiTitle">
+    <h3 id="apiTitle">JSON API</h3>
+    <div class="muted small">The same endpoints the demo uses. Images are base64 in JSON; every response carries an <code>X-Request-Id</code> that matches one structured log line in CloudWatch.</div>
+    <div class="endpoints">
+      <div class="ep"><span class="m">GET</span><code>/health</code><div class="muted small">OpenCV version, arch, build</div></div>
+      <div class="ep"><span class="m post">POST</span><code>/api/locate</code><div class="muted small">{screenshot_b64, template_b64, min_score?}</div></div>
+      <div class="ep"><span class="m post">POST</span><code>/api/verify</code><div class="muted small">{before_b64, after_b64, roi?}</div></div>
+      <div class="ep"><span class="m post">POST</span><code>/api/upload-url</code><div class="muted small">{content_type, size?} → {url, key}</div></div>
+      <div class="ep"><span class="m post">POST</span><code>/api/segment</code><div class="muted small">{key, full_targets?} | {video_b64} | {sample}</div></div>
+      <div class="ep"><span class="m">GET</span><code>/api/samples</code><div class="muted small">bundled sample inputs</div></div>
+    </div>
+<pre id="curl">curl -s ORIGIN/health
+curl -s -X POST ORIGIN/api/locate -H 'content-type: application/json' \
+  -d "{\"screenshot_b64\":\"$(base64 -i screen.png)\",\"template_b64\":\"$(base64 -i button.png)\"}"</pre>
+  </section>
+
+  <footer class="card">
+    <div class="shield">
+      <div class="ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
+      <p><b>Responsible use.</b> Uploads are processed in memory and deleted immediately; temporary uploads expire within 24 h. No data is used for training. Logs contain timings and sizes only, never images or IP addresses. Please don't upload recordings containing other people's personal data.</p>
+    </div>
+    <div class="row small">
+      <a href="https://github.com/chessoren/cofounder-vision" rel="noopener">GitHub</a>
+      <span class="muted" id="buildId"></span>
+    </div>
+  </footer>
+</div>
+
+<dialog id="zoom" aria-label="Enlarged image">
+  <button class="btn ghost close" type="button" id="zoomClose" aria-label="Close">✕</button>
+  <img id="zoomImg" alt="">
+</dialog>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const API = location.origin;
+  $("curl").textContent = $("curl").textContent.replaceAll("ORIGIN", API);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const fmt = (v, d = 2) => (v === null || v === undefined || Number.isNaN(v)) ? "–" : (typeof v === "number" ? (Number.isInteger(v) ? String(v) : v.toFixed(d)) : String(v));
+  const ms = (v) => v == null ? "–" : (v >= 1000 ? (v / 1000).toFixed(2) + " s" : Math.round(v) + " ms");
+
+  // ---------- tabs (WAI-ARIA tabs pattern) ----------
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  function select(tab, focus) {
+    tabs.forEach((t) => {
+      const on = t === tab;
+      t.setAttribute("aria-selected", on);
+      t.tabIndex = on ? 0 : -1;
+      $(t.getAttribute("aria-controls")).hidden = !on;
+    });
+    if (focus) tab.focus();
+    try { history.replaceState(null, "", "#" + tab.id.replace("tab-", "")); } catch (e) {}
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => select(t));
+    t.addEventListener("keydown", (e) => {
+      const k = e.key; let j = null;
+      if (k === "ArrowRight") j = (i + 1) % tabs.length; else if (k === "ArrowLeft") j = (i - 1 + tabs.length) % tabs.length;
+      else if (k === "Home") j = 0; else if (k === "End") j = tabs.length - 1;
+      if (j !== null) { e.preventDefault(); select(tabs[j], true); }
+    });
+  });
+  const initial = tabs.find((t) => "#" + t.id.replace("tab-", "") === location.hash);
+  if (initial) select(initial);
+
+  // ---------- zoom dialog ----------
+  const zoom = $("zoom");
+  function openZoom(src, alt) { $("zoomImg").src = src; $("zoomImg").alt = alt || ""; zoom.showModal(); }
+  $("zoomClose").onclick = () => zoom.close();
+  zoom.addEventListener("click", (e) => { if (e.target === zoom) zoom.close(); });
+  document.addEventListener("click", (e) => {
+    const img = e.target.closest("img[data-zoom]");
+    if (img) openZoom(img.src, img.alt);
+  });
+
+  // ---------- helpers ----------
+  async function api(path, body) {
+    const t0 = performance.now();
+    const r = await fetch(API + path, body === undefined ? {} : { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    const rtt = performance.now() - t0;
+    let data = null;
+    try { data = await r.json(); } catch (e) { throw new Error(`HTTP ${r.status} (non-JSON response)`); }
+    if (!r.ok) throw new Error((data && (data.message || data.error)) || `HTTP ${r.status}`);
+    data._rtt = rtt; data._rid = r.headers.get("x-request-id");
+    return data;
+  }
+  function setStatus(el, msg, kind) {
+    el.className = "status" + (kind === "err" ? " err" : "");
+    el.innerHTML = (kind === "busy" ? '<span class="spin" aria-hidden="true"></span>' : "") + msg;
+  }
+  const blobToB64 = (blob) => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(",")[1]); fr.onerror = rej; fr.readAsDataURL(blob); });
+  async function urlToB64(url) { const r = await fetch(url); if (!r.ok) throw new Error("could not load sample"); return blobToB64(await r.blob()); }
+
+  // Images: keep under 4096 px and ~2.6 MB so two of them fit the 6 MB request limit.
+  async function fileToB64(file) {
+    if (!/^image\//.test(file.type)) throw new Error("Please choose a PNG, JPEG or WebP image.");
+    const bmp = await createImageBitmap(file);
+    const maxSide = 4096, maxBytes = 2.6e6;
+    if (file.size <= maxBytes && bmp.width <= maxSide && bmp.height <= maxSide && /png|jpeg/.test(file.type)) return blobToB64(file);
+    let scale = Math.min(1, maxSide / Math.max(bmp.width, bmp.height));
+    for (let i = 0; i < 6; i++) {
+      const c = document.createElement("canvas");
+      c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
+      c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+      const blob = await new Promise((r) => c.toBlob(r, "image/png"));
+      if (blob.size <= maxBytes) return blobToB64(blob);
+      scale *= 0.8;
+    }
+    throw new Error("Image too large even after downscaling.");
+  }
+
+  const inputs = {};  // name -> {b64, src}
+  function bindImageInput(name, fileId, prevId) {
+    const input = $(fileId), prev = $(prevId), drop = input.closest(".drop");
+    const show = (src) => { prev.src = src; prev.hidden = false; };
+    input.addEventListener("change", async () => {
+      const f = input.files[0]; if (!f) return;
+      try { inputs[name] = { b64: await fileToB64(f) }; show(URL.createObjectURL(f)); }
+      catch (e) { alert(e.message); }
+    });
+    ["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, () => drop.classList.add("over")));
+    ["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, () => drop.classList.remove("over")));
+    return { set: (b64, src) => { inputs[name] = { b64 }; show(src); } };
+  }
+  const shot = bindImageInput("shot", "shotFile", "shotPrev");
+  const tmpl = bindImageInput("tmpl", "tmplFile", "tmplPrev");
+  const before = bindImageInput("before", "beforeFile", "beforePrev");
+  const after = bindImageInput("after", "afterFile", "afterPrev");
+  $("minScore").oninput = () => { $("minScoreOut").textContent = Number($("minScore").value).toFixed(2); };
+
+  const stat = (k, v, cls = "") => `<div class="stat ${cls}"><div class="k">${esc(k)}</div><div class="v">${v}</div></div>`;
+
+  // ---------- health ----------
+  api("/health").then((h) => {
+    const arch = h.arch === "aarch64" || h.arch === "arm64" ? "arm64 (Graviton)" : h.arch;
+    $("health").classList.add("ok");
+    $("healthText").textContent = `OpenCV ${h.opencv} · AWS Lambda · ${arch}`;
+    $("health").title = `${h.runtime} · ${h.memory_mb} MB · ${h.region} · build ${h.version && h.version.build_id}`;
+    $("buildId").textContent = "build " + (h.version && h.version.build_id || "dev") + " · " + h.region;
+  }).catch((e) => { $("health").classList.add("err"); $("healthText").textContent = "Service unavailable: " + e.message; });
+
+  // ---------- samples ----------
+  let samples = { locate: [], verify: [], segment: [] };
+  api("/api/samples").then((s) => {
+    samples = s;
+    $("locateSamples").innerHTML = s.locate.map((x, i) => `<button class="chip" type="button" data-i="${i}"><span class="ico">✦</span>${esc(x.title)}</button>`).join("");
+    $("verifySamples").innerHTML = s.verify.map((x, i) => `<button class="chip" type="button" data-i="${i}"><span class="ico">✦</span>${esc(x.title)}</button>`).join("");
+  }).catch(() => {});
+  $("locateSamples").addEventListener("click", async (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const x = samples.locate[+b.dataset.i];
+    setStatus($("findStatus"), "Loading sample…", "busy");
+    try {
+      const [a, c] = await Promise.all([urlToB64("/samples/" + x.screenshot), urlToB64("/samples/" + x.template)]);
+      shot.set(a, "/samples/" + x.screenshot); tmpl.set(c, "/samples/" + x.template);
+      runLocate();
+    } catch (err) { setStatus($("findStatus"), esc(err.message), "err"); }
+  });
+  $("verifySamples").addEventListener("click", async (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const x = samples.verify[+b.dataset.i];
+    setStatus($("verifyStatus"), "Loading sample…", "busy");
+    try {
+      const [a, c] = await Promise.all([urlToB64("/samples/" + x.before), urlToB64("/samples/" + x.after)]);
+      before.set(a, "/samples/" + x.before); after.set(c, "/samples/" + x.after);
+      runVerify();
+    } catch (err) { setStatus($("verifyStatus"), esc(err.message), "err"); }
+  });
+
+  // ---------- locate ----------
+  async function runLocate() {
+    if (!inputs.shot || !inputs.tmpl) return setStatus($("findStatus"), "Add a screenshot and a template, or pick a sample.", "err");
+    const btn = $("locateBtn"); btn.disabled = true;
+    setStatus($("findStatus"), "Matching on AWS Lambda…", "busy");
+    try {
+      const r = await api("/api/locate", { screenshot_b64: inputs.shot.b64, template_b64: inputs.tmpl.b64, min_score: Number($("minScore").value) });
+      $("findImg").src = "data:image/png;base64," + r.annotated_png_b64; $("findImg").dataset.zoom = "1";
+      const found = r.found;
+      const vcls = !found ? "v-bad" : r.ambiguous ? "v-warn" : "v-ok";
+      const vtxt = !found ? "Not found" : r.ambiguous ? "Found, but ambiguous" : `Found, centre (${r.x}, ${r.y})`;
+      $("findStats").innerHTML =
+        `<div class="verdict ${vcls}"><span class="big" aria-hidden="true">${found ? (r.ambiguous ? "!" : "✓") : "✕"}</span>${esc(vtxt)}</div>` +
+        stat("Score", `${fmt(r.score, 3)}<div class="bar"><i style="width:${Math.max(0, Math.min(1, r.score || 0)) * 100}%"></i></div>`) +
+        stat("Scale", r.scale != null ? fmt(r.scale, 2) + "×" : "–") +
+        stat("Method", `<span style="font-size:14px">${esc(r.method || "–")}</span>`, "wide") +
+        stat("Box (x, y, w×h)", found && r.bbox ? `<span style="font-size:15px">${r.bbox[0]}, ${r.bbox[1]} · ${r.w}×${r.h}</span>` : "–", "wide") +
+        stat("Runner-up", r.runner_up != null ? fmt(typeof r.runner_up === "object" ? (r.runner_up.score ?? null) : r.runner_up, 3) : "–") +
+        stat("Ambiguous", r.ambiguous ? "yes" : "no") +
+        stat("OpenCV time", ms(r.elapsed_ms)) +
+        stat("Round trip", ms(r._rtt));
+      $("findOut").hidden = false;
+      setStatus($("findStatus"), `Done · request <code>${esc(r._rid || "")}</code>`);
+    } catch (e) { setStatus($("findStatus"), "Error: " + esc(e.message), "err"); }
+    finally { btn.disabled = false; }
+  }
+  $("locateBtn").onclick = runLocate;
+
+  // ---------- verify ----------
+  async function runVerify() {
+    if (!inputs.before || !inputs.after) return setStatus($("verifyStatus"), "Add a before and an after screenshot, or pick a sample.", "err");
+    const btn = $("verifyBtn"); btn.disabled = true;
+    setStatus($("verifyStatus"), "Comparing on AWS Lambda…", "busy");
+    try {
+      const r = await api("/api/verify", { before_b64: inputs.before.b64, after_b64: inputs.after.b64 });
+      $("verifyImg").src = "data:image/png;base64," + r.annotated_png_b64; $("verifyImg").dataset.zoom = "1";
+      const v = String(r.verdict || (r.changed ? "changed" : "unchanged"));
+      const vcls = r.changed ? "v-ok" : "v-bad";
+      const pct = (x) => typeof x === "number" ? (x <= 1 ? (x * 100).toFixed(1) + "%" : fmt(x)) : (x === true ? "yes" : x === false ? "no" : "–");
+      $("verifyStats").innerHTML =
+        `<div class="verdict ${vcls}"><span class="big" aria-hidden="true">${r.changed ? "✓" : "✕"}</span>${esc(v.replaceAll("_", " "))}</div>` +
+        stat("Local change", pct(r.local_change)) + stat("Global change", pct(r.global_change)) +
+        stat("SSIM local", fmt(r.ssim_local, 3)) + stat("SSIM global", fmt(r.ssim_global, 3)) +
+        stat("Change regions", (r.regions || []).length) + stat("Round trip", ms(r._rtt));
+      $("verifyOut").hidden = false;
+      setStatus($("verifyStatus"), `Done · request <code>${esc(r._rid || "")}</code>`);
+    } catch (e) { setStatus($("verifyStatus"), "Error: " + esc(e.message), "err"); }
+    finally { btn.disabled = false; }
+  }
+  $("verifyBtn").onclick = runVerify;
+
+  // ---------- learn (segment) ----------
+  function putWithProgress(url, blob, ctype, onProgress) {
+    return new Promise((res, rej) => {
+      const x = new XMLHttpRequest();
+      x.open("PUT", url); x.setRequestHeader("Content-Type", ctype);
+      x.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total);
+      x.onload = () => (x.status >= 200 && x.status < 300) ? res() : rej(new Error("upload failed (HTTP " + x.status + ")"));
+      x.onerror = () => rej(new Error("upload failed (network/CORS)"));
+      x.send(blob);
+    });
+  }
+  async function learn(blob, name, sampleName) {
+    const st = $("learnStatus"), btn = $("learnSample");
+    btn.disabled = true; $("videoFile").disabled = true;
+    const t0 = performance.now();
+    try {
+      const ctype = blob.type === "video/quicktime" || /\.mov$/i.test(name) ? "video/quicktime" : "video/mp4";
+      if (blob.size > 40 * 1024 * 1024) throw new Error("Recording is larger than 40 MB.");
+      let body;
+      try {
+        setStatus(st, "Requesting a presigned upload URL…", "busy");
+        const u = await api("/api/upload-url", { content_type: ctype, size: blob.size });
+        st.className = "status";
+        st.innerHTML = '<span class="spin" aria-hidden="true"></span>Uploading to S3 <div class="progress" role="progressbar" aria-label="Upload progress"><i id="upbar"></i></div>';
+        await putWithProgress(u.url, blob, ctype, (p) => { const b = $("upbar"); if (b) b.style.width = (p * 100).toFixed(0) + "%"; });
+        body = { key: u.key };
+      } catch (e) {
+        if (!sampleName) throw e;
+        body = { sample: sampleName };  // fall back to the bundled copy of the sample
+      }
+      setStatus(st, "Analysing the recording with OpenCV on Lambda (frame sampling, change detection, click targets)…", "busy");
+      const r = await api("/api/segment", body);
+      renderSteps(r, performance.now() - t0, name);
+      setStatus(st, `Done · ${esc(name)} · request <code>${esc(r._rid || "")}</code>. The upload has already been deleted.`);
+    } catch (e) { setStatus(st, "Error: " + esc(e.message), "err"); }
+    finally { btn.disabled = false; $("videoFile").disabled = false; }
+  }
+  function renderSteps(r, total, name) {
+    const steps = r.steps || [];
+    const st = r.stats || {};
+    $("learnSummary").innerHTML =
+      stat("Steps", steps.length) + stat("Duration", fmt(r.duration_s, 1) + " s") +
+      stat("Frames analysed", fmt(r.frames_analyzed)) + stat("End-to-end", ms(total));
+    $("timeline").innerHTML = steps.map((s, i) => {
+      const click = s.click && (Array.isArray(s.click) ? { x: s.click[0], y: s.click[1] } : s.click);
+      const bb = s.target_bbox && (Array.isArray(s.target_bbox) ? { x: s.target_bbox[0], y: s.target_bbox[1], w: s.target_bbox[2], h: s.target_bbox[3] } : s.target_bbox);
+      const regions = (s.change_regions || []).length;
+      return `<li class="step">
+        <div class="idx" aria-hidden="true">${i + 1}</div>
+        <div class="body">
+          <div>
+            <div class="meta">
+              <span class="badge">${esc(String(s.action || "step").replaceAll("_", " "))}</span>
+              <span class="badge gray">${fmt(s.t_start, 1)} s – ${fmt(s.t_end, 1)} s</span>
+              ${regions ? `<span class="badge gray">${regions} change region${regions > 1 ? "s" : ""}</span>` : ""}
+            </div>
+            ${s.keyframe_png_b64 ? `<img class="kf" data-zoom="1" loading="lazy" src="data:image/png;base64,${s.keyframe_png_b64}" alt="Keyframe of step ${i + 1}">` : ""}
+          </div>
+          <div class="side">
+            <div class="kv"><b>Click target</b></div>
+            <div class="target">${s.target_png_b64 ? `<img data-zoom="1" src="data:image/png;base64,${s.target_png_b64}" alt="Click target crop of step ${i + 1}">` : '<span class="muted small">no click</span>'}</div>
+            ${click && click.x != null ? `<div class="kv">click at <b>${Math.round(click.x)}, ${Math.round(click.y)}</b></div>` : ""}
+            ${bb && bb.x != null ? `<div class="kv">target box <b>${bb.x}, ${bb.y} · ${bb.w}×${bb.h}</b></div>` : ""}
+            ${s.signature && s.signature.dhash ? `<div class="kv">screen dHash <b>${esc(String(s.signature.dhash).slice(0, 16))}</b></div>` : ""}
+          </div>
+        </div></li>`;
+    }).join("") || '<li class="muted">No steps detected in this recording.</li>';
+    $("learnOut").hidden = false;
+  }
+  $("learnSample").onclick = async () => {
+    const s = (samples.segment || [])[0];
+    if (!s) return setStatus($("learnStatus"), "Sample not available.", "err");
+    setStatus($("learnStatus"), "Fetching the sample recording…", "busy");
+    try {
+      const r = await fetch("/samples/" + s.video);
+      if (!r.ok) throw new Error("could not load sample");
+      const blob = new Blob([await r.blob()], { type: "video/mp4" });
+      learn(blob, s.title || s.video, s.video);
+    } catch (e) { setStatus($("learnStatus"), "Error: " + esc(e.message), "err"); }
+  };
+  const vd = $("videoDrop");
+  ["dragenter", "dragover"].forEach((ev) => vd.addEventListener(ev, () => vd.classList.add("over")));
+  ["dragleave", "drop"].forEach((ev) => vd.addEventListener(ev, () => vd.classList.remove("over")));
+  $("videoFile").addEventListener("change", () => { const f = $("videoFile").files[0]; if (f) learn(f, f.name); });
+})();
+</script>
+</body>
+</html>

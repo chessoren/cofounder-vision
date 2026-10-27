@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 820" width="1400" height="820" font-family="Inter Tight, Inter, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3D82DE"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A8F4C"/></marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C2410C"/></marker>
+  </defs>
+  <rect width="1400" height="820" fill="#F4F6FA"/>
+  <text x="44" y="52" font-size="28" font-weight="700" fill="#11315D">Agent workflow: OpenCV 5 output decides the next action</text>
+  <text x="44" y="80" font-size="15" fill="#5A6B85">One step of a learned workflow. Every arrow is driven by a measured visual result, not by the model's guess.</text>
+
+  <!-- PERCEIVE -->
+  <rect x="44" y="120" width="380" height="270" rx="20" fill="#fff" stroke="#9CC0EE" stroke-width="1.5"/>
+  <text x="68" y="154" font-size="13" font-weight="700" fill="#3D82DE" letter-spacing="1.5">PERCEPTION · look(step)</text>
+  <text x="68" y="186" font-size="14" fill="#11315D">• screen_signature vs the demonstration</text>
+  <text x="84" y="206" font-size="12.5" fill="#5A6B85">am I on the expected screen?</text>
+  <text x="68" y="236" font-size="14" fill="#11315D">• locate(target crop): score, scale, method</text>
+  <text x="84" y="256" font-size="12.5" fill="#5A6B85">multi-scale NCC, features + homography</text>
+  <text x="68" y="286" font-size="14" fill="#11315D">• locate_all: identical controls, ordered</text>
+  <text x="84" y="306" font-size="12.5" fill="#5A6B85">ordinal grounding: "1st of 5", as demonstrated</text>
+  <text x="68" y="342" font-size="12.5" font-weight="600" fill="#11315D">→ suggested_click or null, ambiguity flag</text>
+
+  <!-- DECIDE -->
+  <rect x="510" y="120" width="380" height="270" rx="20" fill="#FFF9F2" stroke="#E9B27A" stroke-width="1.5"/>
+  <text x="534" y="154" font-size="13" font-weight="700" fill="#C7691A" letter-spacing="1.5">DECISION · brain</text>
+  <text x="534" y="186" font-size="14" fill="#7A3E08">Strands agent (local model) or policy</text>
+  <text x="534" y="216" font-size="13" fill="#6B4A2A">found + unambiguous → click</text>
+  <text x="534" y="240" font-size="13" fill="#6B4A2A">null → wait 1.5 s, look again (×2)</text>
+  <text x="534" y="264" font-size="13" fill="#6B4A2A">still null on step 1 after a run → done</text>
+  <text x="534" y="288" font-size="13" fill="#6B4A2A">still null elsewhere → ask_human</text>
+  <text x="534" y="312" font-size="13" fill="#6B4A2A">irreversible step → batch approval first</text>
+  <text x="534" y="350" font-size="12.5" font-weight="600" fill="#7A3E08">guard: click only where OpenCV saw a control</text>
+
+  <!-- ACT -->
+  <rect x="976" y="120" width="380" height="270" rx="20" fill="#fff" stroke="#9CC0EE" stroke-width="1.5"/>
+  <text x="1000" y="154" font-size="13" font-weight="700" fill="#3D82DE" letter-spacing="1.5">ACTION · click(x, y, step)</text>
+  <text x="1000" y="186" font-size="14" fill="#11315D">• refused if (x, y) is not in a box</text>
+  <text x="1016" y="206" font-size="12.5" fill="#5A6B85">returned by the last look()</text>
+  <text x="1000" y="236" font-size="14" fill="#11315D">• click on the display adapter</text>
+  <text x="1016" y="256" font-size="12.5" fill="#5A6B85">window pixels or macOS screen (Retina)</text>
+  <text x="1000" y="286" font-size="14" fill="#11315D">• observation of the user is paused</text>
+  <text x="1016" y="306" font-size="12.5" fill="#5A6B85">its own clicks never count as a workflow</text>
+
+  <line x1="424" y1="255" x2="504" y2="255" stroke="#3D82DE" stroke-width="2.5" marker-end="url(#b)"/>
+  <line x1="890" y1="255" x2="970" y2="255" stroke="#3D82DE" stroke-width="2.5" marker-end="url(#b)"/>
+
+  <!-- VERIFY -->
+  <rect x="510" y="450" width="380" height="200" rx="20" fill="#fff" stroke="#9CC0EE" stroke-width="1.5"/>
+  <text x="534" y="484" font-size="13" font-weight="700" fill="#3D82DE" letter-spacing="1.5">VERIFICATION · verify_change</text>
+  <text x="534" y="516" font-size="14" fill="#11315D">absdiff + morphology + SSIM in the click ROI</text>
+  <text x="534" y="540" font-size="14" fill="#11315D">and globally; next-screen signature check</text>
+  <text x="534" y="576" font-size="12.5" fill="#5A6B85">verdict: changed · no_change · unexpected_global</text>
+  <text x="534" y="598" font-size="12.5" fill="#5A6B85">now_on_next_expected_screen: true / false</text>
+  <path d="M1166 390 C 1166 520, 1000 550, 894 550" fill="none" stroke="#3D82DE" stroke-width="2.5" marker-end="url(#b)"/>
+
+  <!-- OUTCOMES -->
+  <rect x="44" y="450" width="380" height="96" rx="16" fill="#E9F7EF" stroke="#8ED0AA"/>
+  <text x="66" y="482" font-size="14" font-weight="700" fill="#0E5A30">changed + expected next screen</text>
+  <text x="66" y="506" font-size="13" fill="#2F5A43">→ next step (or next item of the batch)</text>
+  <path d="M510 520 C 470 520, 460 500, 428 500" fill="none" stroke="#1A8F4C" stroke-width="2.2" marker-end="url(#g)"/>
+  <path d="M234 450 C 234 420, 234 410, 234 394" fill="none" stroke="#1A8F4C" stroke-width="2.2" marker-end="url(#g)"/>
+
+  <rect x="44" y="580" width="380" height="110" rx="16" fill="#FFF4E8" stroke="#E9B27A"/>
+  <text x="66" y="612" font-size="14" font-weight="700" fill="#7A3E08">no_change</text>
+  <text x="66" y="636" font-size="13" fill="#6B4A2A">→ wait 2 s, re-verify (slow app?)</text>
+  <text x="66" y="658" font-size="13" fill="#6B4A2A">→ look + click once more → ask_human</text>
+  <path d="M510 610 C 470 610, 460 630, 428 630" fill="none" stroke="#C7691A" stroke-width="2.2" marker-end="url(#r)"/>
+
+  <rect x="976" y="450" width="380" height="110" rx="16" fill="#FDECEC" stroke="#F2A7A7"/>
+  <text x="998" y="482" font-size="14" font-weight="700" fill="#9B1C1C">changed, but not the expected screen</text>
+  <text x="998" y="506" font-size="13" fill="#7F1D1D">(e.g. a security dialog never seen</text>
+  <text x="998" y="526" font-size="13" fill="#7F1D1D">in the demonstration) → ask_human</text>
+  <path d="M890 600 C 930 600, 940 520, 972 510" fill="none" stroke="#C2410C" stroke-width="2.2" marker-end="url(#r)"/>
+
+  <rect x="976" y="590" width="380" height="100" rx="16" fill="#EAF2FD" stroke="#9CC0EE"/>
+  <text x="998" y="622" font-size="14" font-weight="700" fill="#11315D">ask_human (macOS dialog)</text>
+  <text x="998" y="646" font-size="13" fill="#43546E">the person decides: continue · stop</text>
+  <text x="998" y="668" font-size="13" fill="#43546E">the agent then looks again before acting</text>
+  <line x1="1166" y1="560" x2="1166" y2="586" stroke="#C2410C" stroke-width="2" marker-end="url(#r)"/>
+
+  <rect x="44" y="720" width="1312" height="64" rx="14" fill="#fff" stroke="#C9D6EA"/>
+  <text x="66" y="748" font-size="13.5" font-weight="600" fill="#11315D">Every look, score, verdict, decision and human answer is written to trace.jsonl, with annotated frames:</text>
+  <text x="66" y="770" font-size="13" fill="#5A6B85">the trace in the report shows OpenCV results changing the next tool call (wait instead of retry, human instead of click, done instead of loop).</text>
+</svg>

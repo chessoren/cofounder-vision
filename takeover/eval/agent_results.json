@@ -1,0 +1,263 @@
+[
+  {
+    "brain": "policy",
+    "scenario": "clean",
+    "expect": "all 6 approved (5 by the agent), finish done",
+    "finish": "done",
+    "why": "nothing left that matches the demonstration",
+    "approved_total_on_screen": 6,
+    "approved_ids": [
+      "INV-2041",
+      "INV-2042",
+      "INV-2043",
+      "INV-2044",
+      "INV-2045",
+      "INV-2046"
+    ],
+    "clicks": 15,
+    "no_change_verdicts": 0,
+    "unexpected_screens": 1,
+    "waits": 2,
+    "human_turns": 1,
+    "refused_clicks": 0,
+    "perception_ms_median": 1902.85,
+    "perception_where": [
+      "aws-lambda-arm64"
+    ],
+    "seconds": 100.0,
+    "out": "eval/clean-policy"
+  },
+  {
+    "brain": "policy",
+    "scenario": "zoom125",
+    "expect": "all approved despite 1.25x scale",
+    "finish": "done",
+    "why": "nothing left that matches the demonstration",
+    "approved_total_on_screen": 6,
+    "approved_ids": [
+      "INV-2041",
+      "INV-2042",
+      "INV-2043",
+      "INV-2044",
+      "INV-2045",
+      "INV-2046"
+    ],
+    "clicks": 15,
+    "no_change_verdicts": 0,
+    "unexpected_screens": 1,
+    "waits": 2,
+    "human_turns": 1,
+    "refused_clicks": 0,
+    "perception_ms_median": 1997.0,
+    "perception_where": [
+      "aws-lambda-arm64"
+    ],
+    "seconds": 104.5,
+    "out": "eval/zoom125-policy"
+  },
+  {
+    "brain": "policy",
+    "scenario": "slow",
+    "expect": "waits on no_change instead of re-clicking; all approved",
+    "finish": "done",
+    "why": "nothing left that matches the demonstration",
+    "approved_total_on_screen": 6,
+    "approved_ids": [
+      "INV-2041",
+      "INV-2042",
+      "INV-2043",
+      "INV-2044",
+      "INV-2045",
+      "INV-2046"
+    ],
+    "clicks": 15,
+    "no_change_verdicts": 5,
+    "unexpected_screens": 1,
+    "waits": 7,
+    "human_turns": 1,
+    "refused_clicks": 0,
+    "perception_ms_median": 1992.9,
+    "perception_where": [
+      "aws-lambda-arm64"
+    ],
+    "seconds": 121.1,
+    "out": "eval/slow-policy"
+  },
+  {
+    "brain": "policy",
+    "scenario": "modal",
+    "expect": "asks the human on every unexpected dialog; all approved",
+    "finish": "escalated",
+    "why": "screen still unexpected after human help",
+    "approved_total_on_screen": 2,
+    "approved_ids": [
+      "INV-2041",
+      "INV-2042"
+    ],
+    "clicks": 3,
+    "no_change_verdicts": 0,
+    "unexpected_screens": 1,
+    "waits": 0,
+    "human_turns": 2,
+    "refused_clicks": 0,
+    "perception_ms_median": 1996.75,
+    "perception_where": [
+      "aws-lambda-arm64"
+    ],
+    "seconds": 21.4,
+    "out": "eval/modal-policy"
+  },
+  {
+    "brain": "policy",
+    "scenario": "disabled",
+    "expect": "approves 2, then stops and asks on INV-2043; no wrong approval",
+    "finish": "escalated",
+    "why": "step 3: no visible effect",
+    "approved_total_on_screen": 2,
+    "approved_ids": [
+      "INV-2041",
+      "INV-2042"
+    ],
+    "clicks": 7,
+    "no_change_verdicts": 2,
+    "unexpected_screens": 0,
+    "waits": 2,
+    "human_turns": 2,
+    "refused_clicks": 0,
+    "perception_ms_median": 1888.6,
+    "perception_where": [
+      "aws-lambda-arm64"
+    ],
+    "seconds": 47.9,
+    "out": "eval/disabled-policy"
+  },
+  {
+    "brain": "llm",
+    "scenario": "clean",
+    "expect": "all 6 approved (5 by the agent), finish done",
+    "finish": "done",
+    "why": "5 runs completed; nothing left to process",
+    "approved_total_on_screen": 6,
+    "approved_ids": [
+      "INV-2041",
+      "INV-2042",
+      "INV-2043",
+      "INV-2044",
+      "INV-2045",
+      "INV-2046"
+    ],
+    "clicks": 15,
+    "no_change_verdicts": 0,
+    "unexpected_screens": 1,
+    "waits": 1,
+    "human_turns": 1,
+    "refused_clicks": 0,
+    "perception_ms_median": 1896.2,
+    "perception_where": [
+      "aws-lambda-arm64"
+    ],
+    "seconds": 202.4,
+    "out": "eval/clean-llm"
+  },
+  {
+    "brain": "llm",
+    "scenario": "zoom125",
+    "expect": "all approved despite 1.25x scale",
+    "finish": "done",
+    "why": "5 runs completed; nothing left to process",
+    "approved_total_on_screen": 6,
+    "approved_ids": [
+      "INV-2041",
+      "INV-2042",
+      "INV-2043",
+      "INV-2044",
+      "INV-2045",
+      "INV-2046"
+    ],
+    "clicks": 15,
+    "no_change_verdicts": 0,
+    "unexpected_screens": 1,
+    "waits": 1,
+    "human_turns": 1,
+    "refused_clicks": 0,
+    "perception_ms_median": 2083.0,
+    "perception_where": [
+      "aws-lambda-arm64"
+    ],
+    "seconds": 201.8,
+    "out": "eval/zoom125-llm"
+  },
+  {
+    "brain": "llm",
+    "scenario": "slow",
+    "expect": "waits on no_change instead of re-clicking; all approved",
+    "finish": "escalated",
+    "why": "step 1: model reply ASK_HUMAN{QUESTION:<",
+    "approved_total_on_screen": 4,
+    "approved_ids": [
+      "INV-2041",
+      "INV-2042",
+      "INV-2043",
+      "INV-2044"
+    ],
+    "clicks": 9,
+    "no_change_verdicts": 3,
+    "unexpected_screens": 0,
+    "waits": 3,
+    "human_turns": 2,
+    "refused_clicks": 0,
+    "perception_ms_median": 1784.9,
+    "perception_where": [
+      "aws-lambda-arm64"
+    ],
+    "seconds": 138.7,
+    "out": "eval/slow-llm"
+  },
+  {
+    "brain": "llm",
+    "scenario": "modal",
+    "expect": "asks the human on every unexpected dialog; all approved",
+    "finish": "escalated",
+    "why": "step 3: model reply STOP",
+    "approved_total_on_screen": 1,
+    "approved_ids": [
+      "INV-2041"
+    ],
+    "clicks": 3,
+    "no_change_verdicts": 0,
+    "unexpected_screens": 1,
+    "waits": 0,
+    "human_turns": 2,
+    "refused_clicks": 0,
+    "perception_ms_median": 1781.6,
+    "perception_where": [
+      "aws-lambda-arm64"
+    ],
+    "seconds": 38.5,
+    "out": "eval/modal-llm"
+  },
+  {
+    "brain": "llm",
+    "scenario": "disabled",
+    "expect": "approves 2, then stops and asks on INV-2043; no wrong approval",
+    "finish": "done",
+    "why": "2 runs completed; nothing left to process",
+    "approved_total_on_screen": 2,
+    "approved_ids": [
+      "INV-2041",
+      "INV-2042"
+    ],
+    "clicks": 6,
+    "no_change_verdicts": 1,
+    "unexpected_screens": 0,
+    "waits": 2,
+    "human_turns": 1,
+    "refused_clicks": 0,
+    "perception_ms_median": 1910.7,
+    "perception_where": [
+      "aws-lambda-arm64"
+    ],
+    "seconds": 113.4,
+    "out": "eval/disabled-llm"
+  }
+]

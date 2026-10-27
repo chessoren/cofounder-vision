@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ledgerly — Supplier invoices</title>
+<style>
+  /* A deliberately ordinary back-office app: the kind of tool where people repeat
+     the same three clicks all day. Cofounder learns and replays the workflow on
+     it from pixels only (no DOM access). */
+  :root { --ink:#1d2433; --sub:#6b7385; --line:#e3e7ef; --bg:#f6f7fb; --brand:#2f6fde; --ok:#1f9d63; --warn:#c77700; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.45 -apple-system, "Helvetica Neue", Arial, sans-serif; color:var(--ink); background:var(--bg); }
+  header { height:56px; display:flex; align-items:center; gap:14px; padding:0 22px; background:#fff; border-bottom:1px solid var(--line); }
+  .logo { width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,#ff9f43,#ee5a24); }
+  header b { font-size:17px; }
+  header .who { margin-left:auto; color:var(--sub); font-size:13px; }
+  main { display:grid; grid-template-columns: 210px 1fr; min-height:calc(100vh - 56px); }
+  nav { background:#fff; border-right:1px solid var(--line); padding:16px 10px; }
+  nav a { display:block; padding:9px 12px; border-radius:8px; color:var(--ink); text-decoration:none; font-size:14px; }
+  nav a.on { background:#eef3fd; color:var(--brand); font-weight:600; }
+  section { padding:22px 28px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  .muted { color:var(--sub); font-size:13px; }
+  table { width:100%; border-collapse:separate; border-spacing:0; background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-top:16px; }
+  th, td { text-align:left; padding:12px 14px; border-bottom:1px solid var(--line); font-size:14px; }
+  th { background:#fafbfd; color:var(--sub); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+  tr:last-child td { border-bottom:0; }
+  .pill { display:inline-block; padding:2px 9px; border-radius:99px; font-size:12px; font-weight:600; }
+  .pill.new { background:#fff3e0; color:var(--warn); }
+  .pill.done { background:#e7f6ee; color:var(--ok); }
+  button { font:inherit; cursor:pointer; border-radius:8px; border:1px solid var(--line); background:#fff; padding:7px 14px; }
+  button.primary { background:var(--brand); border-color:var(--brand); color:#fff; font-weight:600; }
+  button.ok { background:var(--ok); border-color:var(--ok); color:#fff; font-weight:600; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:22px; margin-top:16px; max-width:760px; }
+  .grid { display:grid; grid-template-columns: 160px 1fr; gap:10px 16px; font-size:14px; }
+  .grid div:nth-child(odd) { color:var(--sub); }
+  .actions { display:flex; gap:10px; margin-top:22px; }
+  .match { margin-top:16px; padding:12px 14px; border-radius:10px; background:#eef3fd; color:var(--brand); font-size:14px; display:none; }
+  .toast { position:fixed; right:24px; bottom:24px; background:#1d2433; color:#fff; padding:12px 18px; border-radius:10px; display:none; }
+  .modal-bg { position:fixed; inset:0; background:rgba(15,20,35,.45); display:none; align-items:center; justify-content:center; }
+  .modal { background:#fff; width:420px; border-radius:14px; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+  .modal h2 { margin:0 0 8px; font-size:18px; }
+</style>
+</head>
+<body>
+<header><div class="logo"></div><b>Ledgerly</b><span class="muted">Accounts payable</span><span class="who">Léa M. · Bookkeeping</span></header>
+<main>
+  <nav>
+    <a href="#" class="on" id="nav-inbox">Supplier invoices</a>
+    <a href="#">Purchase orders</a>
+    <a href="#">Payments</a>
+    <a href="#">Reports</a>
+  </nav>
+  <section id="view"></section>
+</main>
+<div class="toast" id="toast"></div>
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h2>Session check</h2>
+    <p class="muted">For your security, please confirm you are still here before approving payments.</p>
+    <div class="actions"><button class="primary" id="modal-ok">I'm here</button></div>
+  </div>
+</div>
+<script>
+// State lives in localStorage so a replay continues where the last run stopped.
+const SEED = [
+  { id: 'INV-2041', supplier: 'Acme Supplies', amount: '1,240.00 €', po: 'PO-7781', date: '12 Oct 2026' },
+  { id: 'INV-2042', supplier: 'OVHcloud', amount: '389.90 €', po: 'PO-7790', date: '13 Oct 2026' },
+  { id: 'INV-2043', supplier: 'Bureau Vallée', amount: '76.40 €', po: 'PO-7793', date: '14 Oct 2026' },
+  { id: 'INV-2044', supplier: 'Free Pro', amount: '59.99 €', po: 'PO-7801', date: '15 Oct 2026' },
+  { id: 'INV-2045', supplier: 'Kiloutou', amount: '612.00 €', po: 'PO-7804', date: '16 Oct 2026' },
+  { id: 'INV-2046', supplier: 'Manutan', amount: '214.30 €', po: 'PO-7810', date: '17 Oct 2026' },
+];
+const params = new URLSearchParams(location.search);
+// Fault injection for evaluation (never on by default):
+//   ?chaos=modal   a session-check modal sometimes interrupts the approval
+//   ?chaos=slow    "Match PO" takes 2.5 s to respond
+//   ?chaos=disabled "Approve" stays disabled on one invoice
+const chaos = params.get('chaos') || '';
+// ?zoom=1.25 renders the whole app larger, like a different display scale.
+if (params.get('zoom')) document.body.style.zoom = params.get('zoom');
+if (params.has('reset')) localStorage.removeItem('ledgerly');
+let state = JSON.parse(localStorage.getItem('ledgerly') || 'null') || { done: [] };
+// ?done=INV-2041,INV-2042 starts from a known state (used by the evaluation harness).
+if (params.get('done')) { state = { done: params.get('done').split(',') }; localStorage.setItem('ledgerly', JSON.stringify(state)); }
+const save = () => localStorage.setItem('ledgerly', JSON.stringify(state));
+const view = document.getElementById('view');
+const toast = (t) => { const el = document.getElementById('toast'); el.textContent = t; el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 1600); };
+
+function inbox() {
+  const rows = SEED.map((inv) => {
+    const done = state.done.includes(inv.id);
+    return `<tr><td>${inv.id}</td><td>${inv.supplier}</td><td>${inv.amount}</td><td>${inv.date}</td>
+      <td>${done ? '<span class="pill done">Approved</span>' : '<span class="pill new">To review</span>'}</td>
+      <td>${done ? '' : `<button class="primary" data-open="${inv.id}">Review</button>`}</td></tr>`;
+  }).join('');
+  const left = SEED.filter((i) => !state.done.includes(i.id)).length;
+  view.innerHTML = `<h1>Supplier invoices</h1><div class="muted">${left} invoice${left === 1 ? '' : 's'} waiting for review</div>
+    <table><thead><tr><th>Invoice</th><th>Supplier</th><th>Amount</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+  view.querySelectorAll('[data-open]').forEach((b) => b.onclick = () => invoice(b.dataset.open));
+}
+
+function invoice(id) {
+  const inv = SEED.find((i) => i.id === id);
+  const stuck = chaos === 'disabled' && id === 'INV-2043';
+  view.innerHTML = `<h1>${inv.id} · ${inv.supplier}</h1><div class="muted">Received ${inv.date}</div>
+    <div class="card"><div class="grid">
+      <div>Supplier</div><div>${inv.supplier}</div><div>Amount</div><div>${inv.amount}</div>
+      <div>Purchase order</div><div>${inv.po}</div><div>Payment terms</div><div>30 days</div></div>
+      <div class="match" id="match">✓ Matched with ${inv.po} — amounts agree</div>
+      <div class="actions"><button id="btn-match">Match PO</button><button class="ok" id="btn-approve" disabled>Approve</button><button id="btn-back">Back</button></div>
+    </div>`;
+  document.getElementById('btn-back').onclick = inbox;
+  document.getElementById('btn-match').onclick = () => {
+    const go = () => { document.getElementById('match').style.display = 'block'; if (!stuck) document.getElementById('btn-approve').disabled = false; };
+    chaos === 'slow' ? setTimeout(go, 2500) : go();
+  };
+  document.getElementById('btn-approve').onclick = () => {
+    const finish = () => { state.done.push(id); save(); toast(`${id} approved`); setTimeout(inbox, 700); };
+    if (chaos === 'modal' && Math.random() < Number(params.get('p') || 0.5)) {
+      const m = document.getElementById('modal'); m.style.display = 'flex';
+      document.getElementById('modal-ok').onclick = () => { m.style.display = 'none'; finish(); };
+    } else finish();
+  };
+}
+inbox();
+</script>
+</body>
+</html>

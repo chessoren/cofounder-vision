@@ -1,0 +1,50 @@
+{
+  "locate": [
+    {
+      "id": "cofounder-retina",
+      "title": "Cofounder: model picker on a 2x Retina screen",
+      "screenshot": "cofounder_retina_screenshot.png",
+      "template": "cofounder_template.png"
+    },
+    {
+      "id": "locate1",
+      "title": "Find the '+ New invoice' button",
+      "screenshot": "locate1_screenshot.png",
+      "template": "locate1_template.png"
+    },
+    {
+      "id": "locate2",
+      "title": "Find 'Export' (template captured at 2x Retina)",
+      "screenshot": "locate2_screenshot.png",
+      "template": "locate2_template.png"
+    }
+  ],
+  "verify": [
+    {
+      "id": "verify1",
+      "title": "Did 'Save invoice' work?",
+      "before": "verify1_before.png",
+      "after": "verify1_after.png"
+    },
+    {
+      "id": "verify2",
+      "title": "A click that did nothing",
+      "before": "verify2_before.png",
+      "after": "verify2_after.png"
+    }
+  ],
+  "segment": [
+    {
+      "id": "approve-invoice",
+      "title": "Approve an invoice (demo app recording, 12 s)",
+      "video": "approve-invoice.mp4",
+      "bytes": 728102
+    },
+    {
+      "id": "recording1",
+      "title": "Create an invoice and export (synthetic, 12 s)",
+      "video": "recording1.mp4",
+      "bytes": 793485
+    }
+  ]
+}

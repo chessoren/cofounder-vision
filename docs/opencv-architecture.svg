@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 860" width="1400" height="860" font-family="Inter Tight, Inter, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3D82DE"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C7691A"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A8F4C"/></marker>
+    <linearGradient id="cv" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EAF2FD"/><stop offset="1" stop-color="#DDEBFC"/></linearGradient>
+  </defs>
+  <rect width="1400" height="860" fill="#F4F6FA"/>
+  <text x="44" y="52" font-size="28" font-weight="700" fill="#11315D">Cofounder Vision: system architecture</text>
+  <text x="44" y="80" font-size="15" fill="#5A6B85">Show a workflow once → OpenCV 5 learns it from the recording → an agent replays it, verifying every step from pixels.</text>
+
+  <!-- ===== Mac ===== -->
+  <rect x="40" y="108" width="620" height="712" rx="20" fill="#fff" stroke="#C9D6EA"/>
+  <text x="64" y="140" font-size="17" font-weight="700" fill="#11315D">On the user's Mac</text>
+
+  <rect x="64" y="160" width="270" height="118" rx="14" fill="#EAF2FD" stroke="#9CC0EE"/>
+  <text x="82" y="188" font-size="15" font-weight="600" fill="#11315D">1 · Show it once</text>
+  <text x="82" y="210" font-size="12.5" fill="#43546E">a screen recording of the person</text>
+  <text x="82" y="227" font-size="12.5" fill="#43546E">doing the task (mp4/mov, cursor visible)</text>
+  <text x="82" y="252" font-size="11.5" fill="#7A8AA3">capture is limited to the app window</text>
+
+  <rect x="366" y="160" width="270" height="118" rx="14" fill="#E9F7EF" stroke="#8ED0AA"/>
+  <text x="384" y="188" font-size="15" font-weight="600" fill="#0E5A30">2 · Learned workflow</text>
+  <text x="384" y="210" font-size="12.5" fill="#2F5A43">steps: click target crops, screen</text>
+  <text x="384" y="227" font-size="12.5" fill="#2F5A43">signatures, ordinal grounding</text>
+  <text x="384" y="252" font-size="11.5" fill="#5D8A6E">takeover/learn.py</text>
+
+  <rect x="64" y="318" width="572" height="300" rx="16" fill="#FFF9F2" stroke="#E9B27A"/>
+  <text x="84" y="348" font-size="15.5" font-weight="700" fill="#7A3E08">3 · Takeover agent (takeover/agent.py)</text>
+  <text x="84" y="370" font-size="12.5" fill="#6B4A2A">perception → decision → action → verification, every step</text>
+
+  <rect x="84" y="388" width="250" height="132" rx="12" fill="#fff" stroke="#E9B27A"/>
+  <text x="100" y="412" font-size="13" font-weight="600" fill="#7A3E08">Brain</text>
+  <text x="100" y="434" font-size="12.5" fill="#6B4A2A">Strands Agents + local model</text>
+  <text x="100" y="452" font-size="12.5" fill="#6B4A2A">(Ollama gemma4), or a</text>
+  <text x="100" y="470" font-size="12.5" fill="#6B4A2A">deterministic policy baseline</text>
+  <text x="100" y="496" font-size="11.5" fill="#9A7A5A">same tools, same guards</text>
+
+  <rect x="352" y="388" width="264" height="132" rx="12" fill="#fff" stroke="#E9B27A"/>
+  <text x="368" y="412" font-size="13" font-weight="600" fill="#7A3E08">Tools (guards inside)</text>
+  <text x="368" y="434" font-size="12.5" fill="#6B4A2A">look(step) · click(x, y, step)</text>
+  <text x="368" y="452" font-size="12.5" fill="#6B4A2A">wait(s) · ask_human(q) · finish()</text>
+  <text x="368" y="476" font-size="11.5" fill="#9A7A5A">click() refuses any point OpenCV</text>
+  <text x="368" y="492" font-size="11.5" fill="#9A7A5A">did not return in the last look()</text>
+  <line x1="334" y1="454" x2="348" y2="454" stroke="#C7691A" stroke-width="2" marker-end="url(#o)"/>
+
+  <rect x="84" y="538" width="532" height="62" rx="12" fill="#fff" stroke="#E9B27A"/>
+  <text x="100" y="562" font-size="13" font-weight="600" fill="#7A3E08">Display adapter</text>
+  <text x="100" y="582" font-size="12.5" fill="#6B4A2A">screenshots in, clicks out · app window (demo) or macOS screen (Retina-aware)</text>
+
+  <rect x="64" y="644" width="270" height="150" rx="14" fill="#EAF2FD" stroke="#9CC0EE"/>
+  <text x="82" y="672" font-size="15" font-weight="600" fill="#11315D">Human control</text>
+  <text x="82" y="694" font-size="12.5" fill="#43546E">batch approval before the first</text>
+  <text x="82" y="711" font-size="12.5" fill="#43546E">irreversible click; native macOS</text>
+  <text x="82" y="728" font-size="12.5" fill="#43546E">dialog on anything unexpected</text>
+
+  <rect x="366" y="644" width="270" height="150" rx="14" fill="#EAF2FD" stroke="#9CC0EE"/>
+  <text x="384" y="672" font-size="15" font-weight="600" fill="#11315D">Observability</text>
+  <text x="384" y="694" font-size="12.5" fill="#43546E">trace.jsonl: every look, score,</text>
+  <text x="384" y="711" font-size="12.5" fill="#43546E">verdict, decision, human answer</text>
+  <text x="384" y="728" font-size="12.5" fill="#43546E">+ annotated frames per step</text>
+
+  <line x1="334" y1="219" x2="362" y2="219" stroke="#1A8F4C" stroke-width="2" marker-end="url(#g)"/>
+  <line x1="500" y1="278" x2="500" y2="314" stroke="#1A8F4C" stroke-width="2" marker-end="url(#g)"/>
+  <line x1="200" y1="618" x2="200" y2="640" stroke="#3D82DE" stroke-width="2" marker-end="url(#b)"/>
+  <line x1="500" y1="618" x2="500" y2="640" stroke="#3D82DE" stroke-width="2" marker-end="url(#b)"/>
+
+  <!-- ===== AWS ===== -->
+  <rect x="720" y="108" width="640" height="712" rx="20" fill="#fff" stroke="#E9B27A"/>
+  <text x="744" y="140" font-size="17" font-weight="700" fill="#7A3E08">AWS (us-west-2)</text>
+
+  <rect x="744" y="160" width="592" height="420" rx="16" fill="url(#cv)" stroke="#9CC0EE"/>
+  <text x="764" y="190" font-size="16" font-weight="700" fill="#11315D">AWS Lambda · arm64 (Graviton) · Python 3.12</text>
+  <text x="764" y="212" font-size="12.5" fill="#43546E">Function URL (HTTPS) · reserved concurrency 5 · 3 GB · timeout 60 s</text>
+
+  <rect x="764" y="232" width="552" height="250" rx="12" fill="#fff" stroke="#9CC0EE"/>
+  <text x="782" y="258" font-size="14" font-weight="700" fill="#11315D">cofounder_vision: OpenCV 5.0.0 (opencv-python-headless 5.0.0.93)</text>
+  <text x="782" y="286" font-size="12.5" font-weight="600" fill="#11315D">segment_recording</text>
+  <text x="930" y="286" font-size="12.5" fill="#43546E">frame differencing + histograms → stable screens;</text>
+  <text x="930" y="303" font-size="12.5" fill="#43546E">masked cursor template tracking → click inference</text>
+  <text x="782" y="330" font-size="12.5" font-weight="600" fill="#11315D">locate</text>
+  <text x="930" y="330" font-size="12.5" fill="#43546E">multi-scale NCC on gray + Canny, coarse-to-fine;</text>
+  <text x="930" y="347" font-size="12.5" fill="#43546E">AKAZE/ORB + RANSAC homography fallback; ambiguity</text>
+  <text x="782" y="374" font-size="12.5" font-weight="600" fill="#11315D">verify_change</text>
+  <text x="930" y="374" font-size="12.5" fill="#43546E">absdiff + morphology + components, SSIM (OpenCV</text>
+  <text x="930" y="391" font-size="12.5" fill="#43546E">filters): changed / no_change / unexpected_global</text>
+  <text x="782" y="418" font-size="12.5" font-weight="600" fill="#11315D">screen_signature</text>
+  <text x="930" y="418" font-size="12.5" fill="#43546E">dHash + HSV histogram: "am I on the expected screen?"</text>
+  <text x="782" y="452" font-size="11.5" fill="#7A8AA3">The same library runs in-process as a fallback: the agent never stops if the network does.</text>
+
+  <rect x="764" y="500" width="268" height="62" rx="12" fill="#fff" stroke="#9CC0EE"/>
+  <text x="780" y="524" font-size="12.5" font-weight="600" fill="#11315D">Routes</text>
+  <text x="780" y="544" font-size="12" fill="#43546E">/api/segment · locate · verify · /health</text>
+  <rect x="1048" y="500" width="268" height="62" rx="12" fill="#fff" stroke="#9CC0EE"/>
+  <text x="1064" y="524" font-size="12.5" font-weight="600" fill="#11315D">Web demo (GET /)</text>
+  <text x="1064" y="544" font-size="12" fill="#43546E">judges try all three in a browser</text>
+
+  <rect x="744" y="604" width="288" height="96" rx="14" fill="#232F3E"/>
+  <text x="762" y="632" font-size="14.5" font-weight="700" fill="#FF9900">Amazon S3</text>
+  <text x="762" y="654" font-size="12.5" fill="#E6EAF0">presigned uploads of recordings,</text>
+  <text x="762" y="672" font-size="12.5" fill="#E6EAF0">deleted after processing; 24 h lifecycle</text>
+
+  <rect x="1048" y="604" width="288" height="96" rx="14" fill="#232F3E"/>
+  <text x="1066" y="632" font-size="14.5" font-weight="700" fill="#FF9900">Amazon CloudWatch</text>
+  <text x="1066" y="654" font-size="12.5" fill="#E6EAF0">one JSON line per request: route,</text>
+  <text x="1066" y="672" font-size="12.5" fill="#E6EAF0">latency, OpenCV timings; no images</text>
+
+  <text x="744" y="738" font-size="12.5" fill="#5A6B85">IAM: execution role limited to the uploads/ prefix · Block Public Access on S3</text>
+  <text x="744" y="758" font-size="12.5" fill="#5A6B85">Deployed by cloud/deploy.py (idempotent, boto3) · smoke test: cloud/smoke_test.py</text>
+
+  <!-- cross arrows -->
+  <path d="M334 200 C 560 120, 700 150, 760 300" fill="none" stroke="#C7691A" stroke-width="2.2" stroke-dasharray="6 4" marker-end="url(#o)"/>
+  <text x="520" y="132" font-size="12" fill="#9A5A1A">recording → /api/segment</text>
+  <path d="M616 470 C 680 470, 700 380, 760 380" fill="none" stroke="#C7691A" stroke-width="2.2" marker-end="url(#o)"/>
+  <text x="640" y="500" font-size="12" fill="#9A5A1A">look / verify</text>
+  <path d="M760 330 C 700 300, 690 250, 640 230" fill="none" stroke="#1A8F4C" stroke-width="2" marker-end="url(#g)"/>
+  <line x1="888" y1="582" x2="888" y2="600" stroke="#C7691A" stroke-width="2" marker-end="url(#o)"/>
+  <line x1="1192" y1="582" x2="1192" y2="600" stroke="#C7691A" stroke-width="2" marker-end="url(#o)"/>
+</svg>
