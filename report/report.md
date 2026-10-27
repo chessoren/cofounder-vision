@@ -149,9 +149,7 @@ uv run python evaluate.py --brains policy,llm                                   
 
 ## 10. Disclosure
 
-Cofounder is a macOS agent project that the author started before this competition. It includes an Electron desktop app,
-an activity observer and a workflow-memory agent. **Everything described in this report was built for the OpenCV AI
-Competition 2026:**
+All the code in this repository was written during the competition's build phase:
 
 - the OpenCV 5 library (`vision/`);
 - the AWS Lambda service and web demo (`cloud/`);
